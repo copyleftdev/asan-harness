@@ -20,7 +20,7 @@ version = "0.0.1"
 edition = "2021"
 rust-version = "1.82"
 license = "Apache-2.0 OR MIT"
-repository = "https://github.com/codetestcode/asan-harness"
+repository = "https://github.com/copyleftdev/asan-harness"
 authors = ["asan-harness contributors"]
 
 [workspace.dependencies]
