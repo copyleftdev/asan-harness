@@ -1,0 +1,15 @@
+[package]
+name = "asan-re-firmware"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Mode D: firmware re-hosting with a Rust-side shadow map — SPEC §7.4. Skeleton."
+
+[features]
+default = []
+real = []
+
+[dependencies]
+asan-core = { workspace = true }

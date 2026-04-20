@@ -1,0 +1,12 @@
+[package]
+name = "asan-alloc"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Allocator hook driving a Sanitizer trait, for in-process ASan harnessing — SPEC §6.4."
+
+[dependencies]
+asan-core   = { workspace = true }
+asan-oracle = { workspace = true }

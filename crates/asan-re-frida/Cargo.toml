@@ -1,0 +1,17 @@
+[package]
+name = "asan-re-frida"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Mode B: closed-source shared-library harnessing via Frida — SPEC §7.2. Skeleton."
+
+[features]
+default = []
+# Enable real frida-gum integration. Off by default because the build
+# pulls in a large native SDK and is Linux-x86_64 / macOS-only in practice.
+real = []
+
+[dependencies]
+asan-core = { workspace = true }

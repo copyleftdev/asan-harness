@@ -1,0 +1,13 @@
+=================================================================
+==12345==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x602000000014 at pc 0x55cd8e2a8b32 bp 0x7ffeabcd1230 sp 0x7ffeabcd1228
+WRITE of size 1 at 0x602000000014 thread T0
+    #0 0x55cd8e2a8b31 in process_input /tmp/buggy.c:12:5
+    #1 0x55cd8e2a8a1f in main /tmp/buggy.c:23:9
+    #2 0x7f8d4f023d8f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x23d8f)
+
+0x602000000014 is located 4 bytes to the right of 16-byte region [0x602000000000,0x602000000010)
+allocated by thread T0 here:
+    #0 0x7f8d4f25ccd1 in __interceptor_malloc
+    #1 0x55cd8e2a89d5 in main /tmp/buggy.c:21:23
+
+SUMMARY: AddressSanitizer: heap-buffer-overflow /tmp/buggy.c:12:5 in process_input

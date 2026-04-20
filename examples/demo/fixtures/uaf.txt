@@ -1,0 +1,14 @@
+==7777==ERROR: AddressSanitizer: heap-use-after-free on address 0x602000000010 at pc 0x400abc
+READ of size 4 at 0x602000000010 thread T0
+    #0 0x400abc in use_after_free /tmp/uaf.c:10:5
+    #1 0x400def in main /tmp/uaf.c:20:5
+
+0x602000000010 is located 0 bytes inside of 16-byte region [0x602000000010,0x602000000020)
+freed by thread T0 here:
+    #0 0x7f111111 in __interceptor_free
+    #1 0x400444 in main /tmp/uaf.c:18:5
+previously allocated by thread T0 here:
+    #0 0x7f000000 in __interceptor_malloc
+    #1 0x400333 in main /tmp/uaf.c:15:15
+
+SUMMARY: AddressSanitizer: heap-use-after-free /tmp/uaf.c:10:5 in use_after_free

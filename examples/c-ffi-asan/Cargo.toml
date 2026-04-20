@@ -1,0 +1,18 @@
+[package]
+name = "c-ffi-asan"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "C library (compiled with -fsanitize=address) + Rust FFI harness."
+publish = false
+build = "build.rs"
+
+[[bin]]
+name = "c-ffi-asan-demo"
+path = "src/main.rs"
+
+[dependencies]
+
+[build-dependencies]
+cc = "1"

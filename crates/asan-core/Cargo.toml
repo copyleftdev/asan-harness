@@ -1,0 +1,24 @@
+[package]
+name = "asan-core"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Sanitizer trait, shadow-memory math, and runtime invariant assertions — SPEC §2, §7."
+
+[features]
+default = []
+# Pull in libafl_asan as the default backend. Gated because it has no_std
+# and platform-specific dependencies we don't want forced on every consumer.
+libafl = []
+
+[dependencies]
+asan-oracle = { workspace = true }
+thiserror = { workspace = true }
+
+[dev-dependencies]
+proptest = "1"
+
+[lints.rust]
+unsafe_op_in_unsafe_fn = "warn"

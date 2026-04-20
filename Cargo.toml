@@ -1,0 +1,66 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/asan-core",
+    "crates/asan-alloc",
+    "crates/asan-driver",
+    "crates/asan-re-frida",
+    "crates/asan-re-qemu",
+    "crates/asan-re-firmware",
+    "crates/asan-oracle",
+    "crates/asan-corpus",
+    "crates/asan-cli",
+    "examples/demo",
+    "examples/rust-asan",
+    "examples/c-ffi-asan",
+]
+
+[workspace.package]
+version = "0.0.1"
+edition = "2021"
+rust-version = "1.82"
+license = "Apache-2.0 OR MIT"
+repository = "https://github.com/codetestcode/asan-harness"
+authors = ["asan-harness contributors"]
+
+[workspace.dependencies]
+# Internal
+asan-core      = { path = "crates/asan-core" }
+asan-alloc     = { path = "crates/asan-alloc" }
+asan-driver    = { path = "crates/asan-driver" }
+asan-oracle    = { path = "crates/asan-oracle" }
+asan-corpus    = { path = "crates/asan-corpus" }
+asan-re-frida  = { path = "crates/asan-re-frida" }
+asan-re-qemu   = { path = "crates/asan-re-qemu" }
+asan-re-firmware = { path = "crates/asan-re-firmware" }
+
+# LibAFL family — SPEC §10.0 vendoring decision.
+libafl           = { version = "0.15", default-features = false }
+libafl_bolts     = { version = "0.15", default-features = false }
+libafl_targets   = { version = "0.15", default-features = false }
+
+# Common utilities
+anyhow     = "1"
+thiserror  = "2"
+serde      = { version = "1", features = ["derive"] }
+serde_json = "1"
+clap       = { version = "4", features = ["derive"] }
+backtrace  = "0.3"
+log        = "0.4"
+env_logger = "0.11"
+
+[profile.release]
+debug = 1           # keep line tables for crash symbolication
+lto = "thin"
+codegen-units = 1
+panic = "abort"
+
+[profile.fuzz]
+inherits = "release"
+debug = 2           # full debuginfo for crash reports
+opt-level = 3
+overflow-checks = true
+
+# Enable ASan-instrumented std when targeting nightly:
+#   RUSTFLAGS="-Zsanitizer=address" cargo +nightly build -Zbuild-std \
+#       --target x86_64-unknown-linux-gnu --profile fuzz

@@ -1,0 +1,11 @@
+==9999==ERROR: AddressSanitizer: attempting double-free on 0x602000000020 in thread T0:
+    #0 0x7f200000 in __interceptor_free
+    #1 0x400777 in bad_cleanup /tmp/uaf.c:40:5
+    #2 0x400888 in main /tmp/uaf.c:50:5
+
+0x602000000020 is located 0 bytes inside of 32-byte region [0x602000000020,0x602000000040)
+freed by thread T0 here:
+    #0 0x7f200000 in __interceptor_free
+    #1 0x400666 in main /tmp/uaf.c:48:5
+
+SUMMARY: AddressSanitizer: double-free /tmp/uaf.c:40:5 in bad_cleanup

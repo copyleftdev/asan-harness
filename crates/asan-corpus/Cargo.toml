@@ -1,0 +1,13 @@
+[package]
+name = "asan-corpus"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Seed corpus with Shannon-entropy weighted selection — SPEC §8.4."
+
+[dependencies]
+asan-oracle = { workspace = true }
+
+[dev-dependencies]

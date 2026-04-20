@@ -1,0 +1,16 @@
+[package]
+name = "asan-harness-demo"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "End-to-end demo: ASan stderr → CrashReport → triage → replay."
+publish = false
+
+[[bin]]
+name = "demo"
+path = "src/main.rs"
+
+[dependencies]
+asan-oracle = { workspace = true }
+anyhow      = { workspace = true }

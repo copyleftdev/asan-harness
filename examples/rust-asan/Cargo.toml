@@ -1,0 +1,18 @@
+[package]
+name = "rust-asan"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "Nightly -Zsanitizer=address demo with planted memory-safety bugs."
+publish = false
+
+[[bin]]
+name = "rust-asan-demo"
+path = "src/main.rs"
+
+[dependencies]
+
+[lints.rust]
+# We intentionally write out-of-bounds — silence the lints.
+unsafe_op_in_unsafe_fn = "allow"

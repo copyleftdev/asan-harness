@@ -1,0 +1,21 @@
+[package]
+name = "asan-driver"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Target / Oracle traits and libFuzzer+AFL++ entry points — SPEC §8, §10.3."
+
+[features]
+default = ["libfuzzer"]
+libfuzzer = []
+forkserver = []
+
+[dependencies]
+asan-core   = { workspace = true }
+asan-oracle = { workspace = true }
+anyhow      = { workspace = true }
+
+[lints.rust]
+unsafe_op_in_unsafe_fn = "warn"
