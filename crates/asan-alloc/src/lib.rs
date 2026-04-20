@@ -92,11 +92,18 @@ mod tests {
             self.frees.fetch_add(1, Ordering::Relaxed);
             Ok(())
         }
-        fn check_access(&self, _: *const u8, _: usize, _: asan_core::AccessKind) -> Result<(), SanError> {
+        fn check_access(
+            &self,
+            _: *const u8,
+            _: usize,
+            _: asan_core::AccessKind,
+        ) -> Result<(), SanError> {
             Ok(())
         }
         fn report(&self) -> asan_core::SanReport {
-            asan_core::SanReport { summary: "counting" }
+            asan_core::SanReport {
+                summary: "counting",
+            }
         }
     }
 

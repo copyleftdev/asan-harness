@@ -35,7 +35,11 @@ pub use shadow::{
 #[derive(Debug, thiserror::Error)]
 pub enum SanError {
     #[error("access would violate sanitizer invariants at {ptr:#x} +{size}")]
-    BadAccess { ptr: u64, size: usize, kind: AccessKind },
+    BadAccess {
+        ptr: u64,
+        size: usize,
+        kind: AccessKind,
+    },
     #[error("free of pointer not under sanitizer management: {ptr:#x}")]
     InvalidFree { ptr: u64 },
     #[error("double free detected at {ptr:#x}")]
@@ -96,7 +100,15 @@ pub struct NoopSanitizer;
 
 impl Sanitizer for NoopSanitizer {
     fn on_alloc(&self, _: *mut u8, _: usize) {}
-    fn on_free(&self, _: *mut u8) -> Result<(), SanError> { Ok(()) }
-    fn check_access(&self, _: *const u8, _: usize, _: AccessKind) -> Result<(), SanError> { Ok(()) }
-    fn report(&self) -> SanReport { SanReport { summary: "noop sanitizer: all accesses pass" } }
+    fn on_free(&self, _: *mut u8) -> Result<(), SanError> {
+        Ok(())
+    }
+    fn check_access(&self, _: *const u8, _: usize, _: AccessKind) -> Result<(), SanError> {
+        Ok(())
+    }
+    fn report(&self) -> SanReport {
+        SanReport {
+            summary: "noop sanitizer: all accesses pass",
+        }
+    }
 }

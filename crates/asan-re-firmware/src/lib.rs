@@ -30,6 +30,8 @@ impl Sanitizer for FirmwareSanitizer {
         Err(SanError::Runtime(Self::UNIMPLEMENTED))
     }
     fn report(&self) -> SanReport {
-        SanReport { summary: Self::UNIMPLEMENTED }
+        SanReport {
+            summary: Self::UNIMPLEMENTED,
+        }
     }
 }

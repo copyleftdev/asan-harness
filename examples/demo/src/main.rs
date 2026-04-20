@@ -43,14 +43,14 @@ fn main() -> Result<()> {
         let text = fs::read_to_string(&path)?;
         let parsed = parse_asan_log(&text);
         if parsed.is_empty() {
-            println!("  [skip] {}: no reports parsed", path.file_name().unwrap().to_string_lossy());
+            println!(
+                "  [skip] {}: no reports parsed",
+                path.file_name().unwrap().to_string_lossy()
+            );
             continue;
         }
         for (i, report) in parsed.into_iter().enumerate() {
-            let name = format!(
-                "{}-{i}.json",
-                path.file_stem().unwrap().to_string_lossy()
-            );
+            let name = format!("{}-{i}.json", path.file_stem().unwrap().to_string_lossy());
             let out_path = findings.join(&name);
             fs::write(&out_path, report.to_json()?)?;
             println!(
@@ -67,7 +67,12 @@ fn main() -> Result<()> {
     println!("triage:");
     let clusters = cluster(&findings)?;
     for (hash, files) in &clusters {
-        println!("  {:016x}  ({} crash{})", hash, files.len(), if files.len() == 1 { "" } else { "es" });
+        println!(
+            "  {:016x}  ({} crash{})",
+            hash,
+            files.len(),
+            if files.len() == 1 { "" } else { "es" }
+        );
         for f in files {
             println!("    {}", f);
         }

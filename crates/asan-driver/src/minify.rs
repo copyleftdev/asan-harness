@@ -119,7 +119,11 @@ mod tests {
         // Crash requires both 0x42 and 0x7F present.
         let out = ddmin(&input, |c| c.contains(&0x42) && c.contains(&0x7F));
         assert!(out.contains(&0x42) && out.contains(&0x7F));
-        assert!(out.len() <= 64, "expected aggressive shrink, got {} bytes", out.len());
+        assert!(
+            out.len() <= 64,
+            "expected aggressive shrink, got {} bytes",
+            out.len()
+        );
     }
 
     #[test]
@@ -132,7 +136,12 @@ mod tests {
     #[test]
     fn contiguous_pair_requirement() {
         // Predicate needs two adjacent 0xFF bytes somewhere in the input.
-        let input: Vec<u8> = b"abcde".iter().chain([0xFFu8, 0xFF].iter()).chain(b"fghij").copied().collect();
+        let input: Vec<u8> = b"abcde"
+            .iter()
+            .chain([0xFFu8, 0xFF].iter())
+            .chain(b"fghij")
+            .copied()
+            .collect();
         let out = ddmin(&input, |c| c.windows(2).any(|w| w == [0xFF, 0xFF]));
         assert_eq!(out, [0xFF, 0xFF]);
     }

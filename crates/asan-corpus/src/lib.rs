@@ -46,7 +46,9 @@ pub struct EdgeTable {
 }
 
 impl EdgeTable {
-    pub fn new() -> Self { Self::default() }
+    pub fn new() -> Self {
+        Self::default()
+    }
 
     pub fn observe(&mut self, edges: &[EdgeId]) {
         for e in edges {
@@ -58,9 +60,13 @@ impl EdgeTable {
         self.counts.get(&edge).copied().unwrap_or(0)
     }
 
-    pub fn len(&self) -> usize { self.counts.len() }
+    pub fn len(&self) -> usize {
+        self.counts.len()
+    }
 
-    pub fn is_empty(&self) -> bool { self.counts.is_empty() }
+    pub fn is_empty(&self) -> bool {
+        self.counts.is_empty()
+    }
 
     /// Shannon entropy over the edge distribution, in nats.
     ///
@@ -69,12 +75,18 @@ impl EdgeTable {
     /// dominates and the fuzzer is stuck.
     pub fn entropy_nats(&self) -> f64 {
         let total: f64 = self.counts.values().map(|&c| c as f64).sum();
-        if total == 0.0 { return 0.0; }
+        if total == 0.0 {
+            return 0.0;
+        }
         self.counts
             .values()
             .map(|&c| {
                 let p = c as f64 / total;
-                if p == 0.0 { 0.0 } else { -p * p.ln() }
+                if p == 0.0 {
+                    0.0
+                } else {
+                    -p * p.ln()
+                }
             })
             .sum()
     }
@@ -84,7 +96,9 @@ pub trait Corpus {
     fn add(&mut self, seed: Seed);
     fn select(&mut self) -> Option<&Seed>;
     fn len(&self) -> usize;
-    fn is_empty(&self) -> bool { self.len() == 0 }
+    fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
 }
 
 /// In-memory corpus with Shannon-energy weighted selection.
@@ -114,7 +128,9 @@ impl EnergyCorpus {
         self
     }
 
-    pub fn edges(&self) -> &EdgeTable { &self.edges }
+    pub fn edges(&self) -> &EdgeTable {
+        &self.edges
+    }
 
     /// Weight for a seed = exp(−λ · hit_count(rarest edge)).
     fn weight(&self, seed: &Seed) -> f64 {
@@ -154,7 +170,9 @@ impl Corpus for EnergyCorpus {
     /// Weighted random selection, O(n) per pick. For large corpora, swap
     /// for a Walker alias method — the contract is stable.
     fn select(&mut self) -> Option<&Seed> {
-        if self.seeds.is_empty() { return None; }
+        if self.seeds.is_empty() {
+            return None;
+        }
         let weights: Vec<f64> = self.seeds.iter().map(|s| self.weight(s)).collect();
         let total: f64 = weights.iter().sum();
         if total <= 0.0 {
@@ -180,7 +198,9 @@ impl Corpus for EnergyCorpus {
         self.seeds.last()
     }
 
-    fn len(&self) -> usize { self.seeds.len() }
+    fn len(&self) -> usize {
+        self.seeds.len()
+    }
 }
 
 #[cfg(test)]
@@ -188,7 +208,12 @@ mod tests {
     use super::*;
 
     fn seed(id: SeedId, edges: &[EdgeId]) -> Seed {
-        Seed { id, bytes: vec![id as u8], edges: edges.to_vec(), times_selected: 0 }
+        Seed {
+            id,
+            bytes: vec![id as u8],
+            edges: edges.to_vec(),
+            times_selected: 0,
+        }
     }
 
     #[test]
@@ -215,13 +240,21 @@ mod tests {
         corpus.add(seed(1, &[100]));
         corpus.add(seed(2, &[200]));
         // Pre-load common edge 100 with many hits by adding ghost observations.
-        for _ in 0..1000 { corpus.edges.observe(&[100]); }
+        for _ in 0..1000 {
+            corpus.edges.observe(&[100]);
+        }
 
         let mut b_wins = 0;
         for _ in 0..1000 {
-            if corpus.select().unwrap().id == 2 { b_wins += 1; }
+            if corpus.select().unwrap().id == 2 {
+                b_wins += 1;
+            }
         }
-        assert!(b_wins > 950, "expected B to dominate selection, got {}/1000", b_wins);
+        assert!(
+            b_wins > 950,
+            "expected B to dominate selection, got {}/1000",
+            b_wins
+        );
     }
 
     #[test]

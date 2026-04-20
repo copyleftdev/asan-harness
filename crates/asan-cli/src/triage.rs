@@ -12,8 +12,8 @@ use std::path::Path;
 
 pub fn cluster_dir(dir: &Path) -> Result<BTreeMap<u64, Vec<String>>> {
     let mut clusters: BTreeMap<u64, Vec<String>> = BTreeMap::new();
-    let entries = std::fs::read_dir(dir)
-        .with_context(|| format!("reading directory {}", dir.display()))?;
+    let entries =
+        std::fs::read_dir(dir).with_context(|| format!("reading directory {}", dir.display()))?;
     for entry in entries {
         let entry = entry?;
         let path = entry.path();

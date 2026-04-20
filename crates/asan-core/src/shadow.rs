@@ -53,7 +53,9 @@ pub enum ShadowByte {
 pub enum PoisonKind {
     /// `0x00..=0x07`: first N bytes accessible. N=0 means a fully-accessible
     /// 8-byte granule; that is represented as `Accessible` in `ShadowByte`.
-    PartialGranularity { n_accessible: u8 },
+    PartialGranularity {
+        n_accessible: u8,
+    },
     HeapRedzone,
     StackRedzone,
     GlobalRedzone,
@@ -144,10 +146,10 @@ mod tests {
     #[test]
     fn partial_granule_matches_spec_2_2_formula() {
         // Shadow byte 5 = first 5 bytes accessible (indices 0..5).
-        assert!(is_accessible_shadow(5, 0, 1));   // byte 0
-        assert!(is_accessible_shadow(5, 4, 1));   // byte 4
-        assert!(!is_accessible_shadow(5, 5, 1));  // byte 5 — poisoned
-        assert!(!is_accessible_shadow(5, 4, 4));  // bytes 4..8 — crosses
+        assert!(is_accessible_shadow(5, 0, 1)); // byte 0
+        assert!(is_accessible_shadow(5, 4, 1)); // byte 4
+        assert!(!is_accessible_shadow(5, 5, 1)); // byte 5 — poisoned
+        assert!(!is_accessible_shadow(5, 4, 4)); // bytes 4..8 — crosses
     }
 
     #[test]
@@ -160,18 +162,9 @@ mod tests {
 
     #[test]
     fn poison_classification_matches_spec_2_2() {
-        assert!(matches!(
-            poison_kind_of(0xFA),
-            PoisonKind::HeapRedzone
-        ));
-        assert!(matches!(
-            poison_kind_of(0xFF),
-            PoisonKind::FreedHeap
-        ));
-        assert!(matches!(
-            poison_kind_of(0xFE),
-            PoisonKind::GlobalRedzone
-        ));
+        assert!(matches!(poison_kind_of(0xFA), PoisonKind::HeapRedzone));
+        assert!(matches!(poison_kind_of(0xFF), PoisonKind::FreedHeap));
+        assert!(matches!(poison_kind_of(0xFE), PoisonKind::GlobalRedzone));
         assert!(matches!(
             poison_kind_of(5),
             PoisonKind::PartialGranularity { n_accessible: 5 }

@@ -27,15 +27,22 @@ impl<T: Target, O: Oracle> ReplayRunner<T, O> {
         // The target's `run` owns its own timing; if it didn't fill `elapsed`
         // we fall back to our wall clock.
         let result = if exec.elapsed.is_zero() {
-            ExecResult { elapsed: start.elapsed(), ..exec }
+            ExecResult {
+                elapsed: start.elapsed(),
+                ..exec
+            }
         } else {
             exec
         };
         self.oracle.observe(&report.raw_input, &result)
     }
 
-    pub fn target(&self) -> &T { &self.target }
-    pub fn oracle(&self) -> &O { &self.oracle }
+    pub fn target(&self) -> &T {
+        &self.target
+    }
+    pub fn oracle(&self) -> &O {
+        &self.oracle
+    }
 }
 
 /// Did the replay reproduce the stored crash's classification?

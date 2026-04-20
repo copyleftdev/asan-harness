@@ -43,6 +43,8 @@ impl Sanitizer for FridaSanitizer {
     }
 
     fn report(&self) -> SanReport {
-        SanReport { summary: Self::UNIMPLEMENTED }
+        SanReport {
+            summary: Self::UNIMPLEMENTED,
+        }
     }
 }

@@ -101,9 +101,17 @@ fn main() -> Result<()> {
     let cli = Cli::parse();
     let format = cli.format;
     match cli.command {
-        Command::Run { target, corpus, sanitizer } => cmd_run(format, target, corpus, sanitizer),
+        Command::Run {
+            target,
+            corpus,
+            sanitizer,
+        } => cmd_run(format, target, corpus, sanitizer),
         Command::Replay { crash } => cmd_replay(format, crash),
-        Command::Minify { crash, keep_byte, out } => cmd_minify(format, crash, keep_byte, out),
+        Command::Minify {
+            crash,
+            keep_byte,
+            out,
+        } => cmd_minify(format, crash, keep_byte, out),
         Command::Triage { dir } => cmd_triage(format, dir),
         Command::Cov { target, input } => cmd_cov(format, target, input),
         Command::Doctor => cmd_doctor(format),
@@ -114,11 +122,14 @@ fn main() -> Result<()> {
 fn cmd_ingest(fmt: OutputFormat, file: Option<PathBuf>, out_dir: Option<PathBuf>) -> Result<()> {
     use std::io::Read;
     let text = match file {
-        Some(path) => fs::read_to_string(&path)
-            .with_context(|| format!("reading {}", path.display()))?,
+        Some(path) => {
+            fs::read_to_string(&path).with_context(|| format!("reading {}", path.display()))?
+        }
         None => {
             let mut buf = String::new();
-            std::io::stdin().read_to_string(&mut buf).context("reading stdin")?;
+            std::io::stdin()
+                .read_to_string(&mut buf)
+                .context("reading stdin")?;
             buf
         }
     };
@@ -152,7 +163,12 @@ fn cmd_ingest(fmt: OutputFormat, file: Option<PathBuf>, out_dir: Option<PathBuf>
     Ok(())
 }
 
-fn cmd_run(_fmt: OutputFormat, target: PathBuf, corpus: PathBuf, sanitizer: SanitizerMode) -> Result<()> {
+fn cmd_run(
+    _fmt: OutputFormat,
+    target: PathBuf,
+    corpus: PathBuf,
+    sanitizer: SanitizerMode,
+) -> Result<()> {
     println!(
         "run: target={} corpus={} sanitizer={:?}",
         target.display(),
@@ -165,8 +181,8 @@ fn cmd_run(_fmt: OutputFormat, target: PathBuf, corpus: PathBuf, sanitizer: Sani
 }
 
 fn cmd_replay(fmt: OutputFormat, crash: PathBuf) -> Result<()> {
-    let bytes = fs::read_to_string(&crash)
-        .with_context(|| format!("reading {}", crash.display()))?;
+    let bytes =
+        fs::read_to_string(&crash).with_context(|| format!("reading {}", crash.display()))?;
     let report = CrashReport::from_json(&bytes).context("parsing crash report")?;
     match fmt {
         OutputFormat::Human => {
@@ -193,8 +209,7 @@ fn cmd_minify(
     keep_byte: Option<u8>,
     out: Option<PathBuf>,
 ) -> Result<()> {
-    let txt = fs::read_to_string(&crash)
-        .with_context(|| format!("reading {}", crash.display()))?;
+    let txt = fs::read_to_string(&crash).with_context(|| format!("reading {}", crash.display()))?;
     let mut report = CrashReport::from_json(&txt)?;
     let original_len = report.raw_input.len();
 
@@ -223,8 +238,10 @@ fn cmd_minify(
     });
     fs::write(&out_path, report.to_json()?)?;
 
-    println!("minify: shrunk {} → {} bytes (predicate: contains 0x{:02x})",
-        original_len, shrunk_len, byte);
+    println!(
+        "minify: shrunk {} → {} bytes (predicate: contains 0x{:02x})",
+        original_len, shrunk_len, byte
+    );
     println!("wrote  : {}", out_path.display());
     Ok(())
 }
@@ -259,7 +276,10 @@ fn cmd_doctor(_fmt: OutputFormat) -> Result<()> {
     println!("  SHADOW_OFFSET_DEFAULT = 0x{:016x}", SHADOW_OFFSET_DEFAULT);
     println!();
     println!("  Spec version          : SPEC.md v0.0 (2026-04-19)");
-    println!("  Schema version        : crash-report v{}", CrashReport::SCHEMA_VERSION);
+    println!(
+        "  Schema version        : crash-report v{}",
+        CrashReport::SCHEMA_VERSION
+    );
     println!();
     println!("note: runtime ASan-liveness probe (dlsym __asan_report_error) pending.");
     Ok(())
@@ -275,7 +295,12 @@ fn print_clusters_human(clusters: &BTreeMap<u64, Vec<String>>) {
     println!("crashes   : {}", total);
     println!();
     for (hash, files) in clusters {
-        println!("  {:016x}  ({} crash{})", hash, files.len(), if files.len() == 1 { "" } else { "es" });
+        println!(
+            "  {:016x}  ({} crash{})",
+            hash,
+            files.len(),
+            if files.len() == 1 { "" } else { "es" }
+        );
         for f in files.iter().take(3) {
             println!("    {}", f);
         }

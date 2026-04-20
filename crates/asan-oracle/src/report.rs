@@ -44,7 +44,12 @@ impl Backtrace {
                     line = s.lineno();
                 }
             }
-            frames.push(Frame { ip, symbol: sym, file, line });
+            frames.push(Frame {
+                ip,
+                symbol: sym,
+                file,
+                line,
+            });
         }
         Self { frames }
     }
@@ -125,7 +130,14 @@ mod tests {
     fn roundtrip_json() {
         let report = CrashReport::new(
             CrashKind::HeapBufferOverflow { side: Side::Right },
-            Backtrace { frames: vec![Frame { ip: 0x1000, symbol: Some("boom".into()), file: None, line: None }] },
+            Backtrace {
+                frames: vec![Frame {
+                    ip: 0x1000,
+                    symbol: Some("boom".into()),
+                    file: None,
+                    line: None,
+                }],
+            },
             None,
             None,
             b"bad input".to_vec(),
@@ -142,7 +154,14 @@ mod tests {
     fn dedup_hash_is_set_on_construction() {
         let report = CrashReport::new(
             CrashKind::DoubleFree,
-            Backtrace { frames: vec![Frame { ip: 0x1, symbol: Some("f".into()), file: None, line: None }] },
+            Backtrace {
+                frames: vec![Frame {
+                    ip: 0x1,
+                    symbol: Some("f".into()),
+                    file: None,
+                    line: None,
+                }],
+            },
             None,
             None,
             Vec::new(),

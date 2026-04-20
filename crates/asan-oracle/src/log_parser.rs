@@ -67,10 +67,10 @@ struct Parser {
 enum State {
     #[default]
     Idle,
-    AfterHeader,       // saw header; waiting for access stack frames
-    InAccessStack,     // collecting access frames
-    InAllocStack,      // collecting alloc frames
-    InFreeStack,       // collecting free frames
+    AfterHeader,   // saw header; waiting for access stack frames
+    InAccessStack, // collecting access frames
+    InAllocStack,  // collecting alloc frames
+    InFreeStack,   // collecting free frames
 }
 
 impl Parser {
@@ -141,16 +141,22 @@ impl Parser {
 
     fn flush(&mut self) {
         if let Some(kind) = self.kind.take() {
-            let access_site = Backtrace { frames: std::mem::take(&mut self.access) };
+            let access_site = Backtrace {
+                frames: std::mem::take(&mut self.access),
+            };
             let alloc_site = if self.alloc.is_empty() {
                 None
             } else {
-                Some(Backtrace { frames: std::mem::take(&mut self.alloc) })
+                Some(Backtrace {
+                    frames: std::mem::take(&mut self.alloc),
+                })
             };
             let free_site = if self.free.is_empty() {
                 None
             } else {
-                Some(Backtrace { frames: std::mem::take(&mut self.free) })
+                Some(Backtrace {
+                    frames: std::mem::take(&mut self.free),
+                })
             };
             let report = CrashReport::new(kind, access_site, alloc_site, free_site, Vec::new());
             self.finished = Some(report);
@@ -186,14 +192,20 @@ fn map_kind(tail: &str) -> Option<CrashKind> {
     const TABLE: &[(&str, CrashKindCtor)] = &[
         ("heap-buffer-overflow", CrashKindCtor::HeapBufferOverflow),
         ("stack-buffer-overflow", CrashKindCtor::StackBufferOverflow),
-        ("global-buffer-overflow", CrashKindCtor::GlobalBufferOverflow),
+        (
+            "global-buffer-overflow",
+            CrashKindCtor::GlobalBufferOverflow,
+        ),
         ("stack-use-after-return", CrashKindCtor::StackUseAfterReturn),
         ("stack-use-after-scope", CrashKindCtor::StackUseAfterScope),
         ("heap-use-after-free", CrashKindCtor::UseAfterFree),
         ("use-after-free", CrashKindCtor::UseAfterFree),
         ("double-free", CrashKindCtor::DoubleFree),
         // Compiler-rt says "attempting free on address which was not malloc()-ed".
-        ("free on address which was not malloc", CrashKindCtor::InvalidFree),
+        (
+            "free on address which was not malloc",
+            CrashKindCtor::InvalidFree,
+        ),
         ("bad-free", CrashKindCtor::InvalidFree),
         ("invalid-free", CrashKindCtor::InvalidFree),
     ];
@@ -224,7 +236,9 @@ impl CrashKindCtor {
             Self::GlobalBufferOverflow => CrashKind::GlobalBufferOverflow,
             Self::StackUseAfterReturn => CrashKind::StackUseAfterReturn,
             Self::StackUseAfterScope => CrashKind::StackUseAfterScope,
-            Self::UseAfterFree => CrashKind::UseAfterFree { quarantine_residence_ms: 0 },
+            Self::UseAfterFree => CrashKind::UseAfterFree {
+                quarantine_residence_ms: 0,
+            },
             Self::DoubleFree => CrashKind::DoubleFree,
             Self::InvalidFree => CrashKind::InvalidFree,
         }
@@ -267,7 +281,12 @@ fn parse_frame(line: &str) -> Option<Frame> {
     let rest = rest.strip_prefix("in ").unwrap_or(rest);
 
     let (symbol, file, line_no) = parse_symbol_and_location(rest);
-    Some(Frame { ip, symbol, file, line: line_no })
+    Some(Frame {
+        ip,
+        symbol,
+        file,
+        line: line_no,
+    })
 }
 
 fn parse_symbol_and_location(s: &str) -> (Option<String>, Option<String>, Option<u32>) {
@@ -353,13 +372,16 @@ previously allocated by thread T0 here:
     #[test]
     fn parses_heap_buffer_overflow_right_side() {
         let r = parse_one(HBO_RIGHT).expect("parse");
-        assert_eq!(
-            r.kind,
-            CrashKind::HeapBufferOverflow { side: Side::Right }
-        );
+        assert_eq!(r.kind, CrashKind::HeapBufferOverflow { side: Side::Right });
         assert_eq!(r.access_site.frames.len(), 3);
-        assert_eq!(r.access_site.frames[0].symbol.as_deref(), Some("process_input"));
-        assert_eq!(r.access_site.frames[0].file.as_deref(), Some("/tmp/buggy.c"));
+        assert_eq!(
+            r.access_site.frames[0].symbol.as_deref(),
+            Some("process_input")
+        );
+        assert_eq!(
+            r.access_site.frames[0].file.as_deref(),
+            Some("/tmp/buggy.c")
+        );
         assert_eq!(r.access_site.frames[0].line, Some(12));
         assert!(r.alloc_site.is_some());
         assert_eq!(r.alloc_site.as_ref().unwrap().frames.len(), 2);
@@ -372,7 +394,10 @@ previously allocated by thread T0 here:
         assert_eq!(r.access_site.frames.len(), 2);
         assert!(r.free_site.is_some());
         assert!(r.alloc_site.is_some());
-        assert_eq!(r.free_site.as_ref().unwrap().frames[1].symbol.as_deref(), Some("main"));
+        assert_eq!(
+            r.free_site.as_ref().unwrap().frames[1].symbol.as_deref(),
+            Some("main")
+        );
         assert_eq!(r.alloc_site.as_ref().unwrap().frames[1].line, Some(15));
     }
 
@@ -405,7 +430,8 @@ previously allocated by thread T0 here:
 
     #[test]
     fn frame_with_module_offset_parses() {
-        let line = "    #2 0x7f8d4f023d8f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x23d8f)";
+        let line =
+            "    #2 0x7f8d4f023d8f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x23d8f)";
         let f = parse_frame(line.trim_start()).unwrap();
         assert_eq!(f.symbol.as_deref(), Some("__libc_start_main"));
         assert_eq!(f.ip, 0x7f8d4f023d8f);
@@ -459,7 +485,8 @@ previously allocated by thread T0 here:
             CrashKind::HeapBufferOverflow { side: Side::Right }
         );
 
-        let before = "==1==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x1 at pc 0x2\n\
+        let before =
+            "==1==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x1 at pc 0x2\n\
                       WRITE of size 1 at 0x1 thread T0\n\
                       0x1 is located 8 bytes before 16-byte region [0x10,0x20)\n\
                       SUMMARY: AddressSanitizer: heap-buffer-overflow\n";

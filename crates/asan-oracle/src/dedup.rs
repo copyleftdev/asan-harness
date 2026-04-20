@@ -87,14 +87,8 @@ mod tests {
     #[test]
     fn separator_prevents_boundary_collisions() {
         // Without the NUL separator, "foo"+"bar" and "foobar"+"" would collide.
-        let a = vec![
-            frame(Some("foo"), 0),
-            frame(Some("bar"), 0),
-        ];
-        let b = vec![
-            frame(Some("foobar"), 0),
-            frame(Some(""), 0),
-        ];
+        let a = vec![frame(Some("foo"), 0), frame(Some("bar"), 0)];
+        let b = vec![frame(Some("foobar"), 0), frame(Some(""), 0)];
         assert_ne!(dedup_hash(&a, 2), dedup_hash(&b, 2));
     }
 

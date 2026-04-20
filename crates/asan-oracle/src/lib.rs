@@ -24,15 +24,21 @@ pub use report::{Backtrace, CrashReport, Frame, Verdict};
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(tag = "kind", rename_all = "snake_case")]
 pub enum CrashKind {
-    HeapBufferOverflow { side: Side },
+    HeapBufferOverflow {
+        side: Side,
+    },
     StackBufferOverflow,
     GlobalBufferOverflow,
-    UseAfterFree { quarantine_residence_ms: u64 },
+    UseAfterFree {
+        quarantine_residence_ms: u64,
+    },
     DoubleFree,
     InvalidFree,
     StackUseAfterReturn,
     StackUseAfterScope,
-    MemoryLeak { bytes: u64 },
+    MemoryLeak {
+        bytes: u64,
+    },
     /// A sanitizer error we could not attribute to any known kind.
     Unknown,
 }
@@ -130,10 +136,16 @@ mod tests {
         // SPEC §12.2 ordering: right-overflow ≥ UAF ≥ double-free ≥ OOB read ≥ invalid-free ≥ leak
         assert!(
             CrashKind::HeapBufferOverflow { side: Side::Right }.severity()
-                >= CrashKind::UseAfterFree { quarantine_residence_ms: 0 }.severity()
+                >= CrashKind::UseAfterFree {
+                    quarantine_residence_ms: 0
+                }
+                .severity()
         );
         assert!(
-            CrashKind::UseAfterFree { quarantine_residence_ms: 0 }.severity()
+            CrashKind::UseAfterFree {
+                quarantine_residence_ms: 0
+            }
+            .severity()
                 >= CrashKind::DoubleFree.severity()
         );
         assert!(CrashKind::DoubleFree.severity() >= CrashKind::InvalidFree.severity());

@@ -1,0 +1,68 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+
+jobs:
+  fmt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt
+      - run: cargo fmt --all -- --check
+
+  clippy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo clippy --workspace --all-targets -- -D warnings
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo test --workspace --all-targets
+      - run: cargo test --workspace --doc
+
+  # The ASan demos need a nightly toolchain. Keep this job as a separate
+  # signal so a nightly regression doesn't block the main PR path.
+  asan-demos:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@nightly
+        with:
+          targets: x86_64-unknown-linux-gnu
+      - uses: Swatinem/rust-cache@v2
+      - name: Install clang
+        run: sudo apt-get update && sudo apt-get install -y clang
+      - name: Build rust-asan demo
+        env:
+          RUSTFLAGS: "-Zsanitizer=address"
+        run: cargo +nightly build -p rust-asan --target x86_64-unknown-linux-gnu
+      - name: Build c-ffi-asan demo
+        env:
+          RUSTFLAGS: "-Zsanitizer=address"
+        run: cargo +nightly build -p c-ffi-asan --target x86_64-unknown-linux-gnu
+      - name: Run verification script
+        run: ./scripts/verify-asan.sh
