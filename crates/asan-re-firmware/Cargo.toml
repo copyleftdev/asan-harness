@@ -6,6 +6,7 @@ rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
 description = "Mode D: firmware re-hosting with a Rust-side shadow map — SPEC §7.4. Skeleton."
+publish = false  # stub; enable once the `real` feature is implemented.
 
 [features]
 default = []

@@ -24,15 +24,17 @@ repository = "https://github.com/codetestcode/asan-harness"
 authors = ["asan-harness contributors"]
 
 [workspace.dependencies]
-# Internal
-asan-core      = { path = "crates/asan-core" }
-asan-alloc     = { path = "crates/asan-alloc" }
-asan-driver    = { path = "crates/asan-driver" }
-asan-oracle    = { path = "crates/asan-oracle" }
-asan-corpus    = { path = "crates/asan-corpus" }
-asan-re-frida  = { path = "crates/asan-re-frida" }
-asan-re-qemu   = { path = "crates/asan-re-qemu" }
-asan-re-firmware = { path = "crates/asan-re-firmware" }
+# Internal. The `version` field is required for `cargo publish` to accept
+# path deps — it tells crates.io which version to resolve against when the
+# path isn't available.
+asan-core      = { path = "crates/asan-core",      version = "0.0.1" }
+asan-alloc     = { path = "crates/asan-alloc",     version = "0.0.1" }
+asan-driver    = { path = "crates/asan-driver",    version = "0.0.1" }
+asan-oracle    = { path = "crates/asan-oracle",    version = "0.0.1" }
+asan-corpus    = { path = "crates/asan-corpus",    version = "0.0.1" }
+asan-re-frida    = { path = "crates/asan-re-frida",    version = "0.0.1" }
+asan-re-qemu     = { path = "crates/asan-re-qemu",     version = "0.0.1" }
+asan-re-firmware = { path = "crates/asan-re-firmware", version = "0.0.1" }
 
 # LibAFL family — SPEC §10.0 vendoring decision.
 libafl           = { version = "0.15", default-features = false }

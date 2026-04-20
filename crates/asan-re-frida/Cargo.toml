@@ -6,6 +6,7 @@ rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
 description = "Mode B: closed-source shared-library harnessing via Frida — SPEC §7.2. Skeleton."
+publish = false  # stub; enable once the `real` feature is implemented.
 
 [features]
 default = []
